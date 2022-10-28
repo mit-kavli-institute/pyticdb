@@ -27,8 +27,8 @@ def _checkout(dbapi_connection, connection_record, connection_proxy):
 @conf.configurable("Credentials")
 @conf.param("username")
 @conf.param("password")
-@conf.option("database", default="tic_82")
-@conf.option("host", default="localhost")
+@conf.option("database", type=str, default="tic_82")
+@conf.option("host", type=str, default="localhost")
 @conf.option("port", type=int, default=5432)
 def create_engine_from_config(username, password, database, host, port):
     url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
