@@ -30,9 +30,7 @@ Install by cloning and running `pip install --upgrade -U .`
 
 Features
 --------
-
-* Provides an easy interface with the TESS Input Catalog
-  * Quick id(s) queries:
+Provides an easy interface with the TESS Input Catalog
 
 .. code-block:: python
     :caption: Querying by TIC primary keys
@@ -50,8 +48,6 @@ Features
     # (283471501, 314.547762642, 40.1913891016, 9.3206),
     # (398895470, 297.32266648, 4.67243988495, 10.5523)]
 
-
-    * Radial queries
 
 .. code-block:: python
     :caption: Radial Querying
