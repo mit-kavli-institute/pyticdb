@@ -33,6 +33,7 @@ Features
 
 * Provides an easy interface with the TESS Input Catalog
   * Quick id(s) queries:
+
 .. code-block:: python
     :caption: Querying by TIC primary keys
 
@@ -51,6 +52,7 @@ Features
 
 
     * Radial queries
+
 .. code-block:: python
     :caption: Radial Querying
 
