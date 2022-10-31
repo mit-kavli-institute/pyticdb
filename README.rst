@@ -33,35 +33,38 @@ Features
 
 * Provides an easy interface with the TESS Input Catalog
   * Quick id(s) queries:
-    .. code-block:: python
-        :caption: Querying by TIC primary keys
+.. code-block:: python
+    :caption: Querying by TIC primary keys
 
-        from pyticdb import query_by_id
+    from pyticdb import query_by_id
 
-        # Query a single id
-        result = query_by_id(379824738, "ra", "dec", "tmag")
-        print(result)  # [(324.599056601, 23.1191319106, 10.291)]
+    # Query a single id
+    result = query_by_id(379824738, "ra", "dec", "tmag")
+    print(result)  # [(324.599056601, 23.1191319106, 10.291)]
 
-        # Or query by multiple_ids
-        result = query_by_id([283471501, 398895470, 500], "id", "ra", "dec", "tmag")
-        print(result)
-        # [(500, 218.728664673, -29.1269141296, 11.6116),
-        # (283471501, 314.547762642, 40.1913891016, 9.3206),
-        # (398895470, 297.32266648, 4.67243988495, 10.5523)]
+    # Or query by multiple_ids
+    result = query_by_id([283471501, 398895470, 500], "id", "ra", "dec", "tmag")
+    print(result)
+    # [(500, 218.728664673, -29.1269141296, 11.6116),
+    # (283471501, 314.547762642, 40.1913891016, 9.3206),
+    # (398895470, 297.32266648, 4.67243988495, 10.5523)]
+
 
     * Radial queries
-      .. code-block:: python
-        :caption: Radial Querying
+.. code-block:: python
+    :caption: Radial Querying
 
-        from pyticdb import query_by_loc
+    from pyticdb import query_by_loc
 
-        result = query_by_loc(10.0, -18.0, 4.0, "id", "ra", "dec", "tmag")
-        print(result)
-        # [(322510862, 7.115643592, -20.8972242098, 18.9336),
-        # (322494926, 7.00403786173, -20.8105061739, 16.6554),
-        # (610234046, 7.01161890217, -20.8083484912, 19.8365),
-        # (322510866, 7.05469912571, -20.8776725744, 15.7966)
-        # ...
+    result = query_by_loc(10.0, -18.0, 4.0, "id", "ra", "dec", "tmag")
+    print(result)
+    # [(322510862, 7.115643592, -20.8972242098, 18.9336),
+    # (322494926, 7.00403786173, -20.8105061739, 16.6554),
+    # (610234046, 7.01161890217, -20.8083484912, 19.8365),
+    # (322510866, 7.05469912571, -20.8776725744, 15.7966)
+    # ...
+
+
 Credits
 -------
 
