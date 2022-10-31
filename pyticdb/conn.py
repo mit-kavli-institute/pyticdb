@@ -4,6 +4,7 @@ import pathlib
 import configurables as conf
 import sqlalchemy as sa
 from loguru import logger
+from sqlalchemy import orm
 
 CONFIG_PATH = pathlib.Path.home() / ".config" / "tic"
 CONFIG_NAME = "db.conf"
@@ -50,4 +51,4 @@ except FileNotFoundError:
     ENGINE = None
 
 
-TicDB = sa.orm.sessionmaker(bind=ENGINE)
+TicDB = orm.sessionmaker(bind=ENGINE)
