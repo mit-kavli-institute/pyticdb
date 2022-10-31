@@ -62,6 +62,31 @@ Provides an easy interface with the TESS Input Catalog
     # ...
 
 
+``PyTICDB`` also provides interfaces for further filtering queries; we provide
+filtering through a django-like parameter and filtering through SQLAlchemy expressions.
+
+.. code-block:: python
+
+    from pyticdb import query_by_loc
+
+    # Django like filtering
+    result = query_by_loc(10.0, -18.0, 4.0, "id", "ra", "dec", "tmag", tmag__le=13.5)
+    # ^ resembles
+    # SELECT id, ra, dec, tmag
+    # FROM ticentries
+    # WHERE q3c_radial_query(ra, dec, 10.0, -18.0, 4.0) AND tmag <= 13.5;
+
+    # Or you may pass SQLAlchemy expressions.
+    from pyticdb.models import TICEntry
+
+    filters = [TICEntry.tmag.between(9, 13.5)]
+    result = query_by_loc(10.0, -18.0, 4.0, "id", "ra", "dec", "tmag", expression_filters=filters)
+    # ^ resembles
+    # SELECT id, ra, dec, tmag
+    # FROM ticentries
+    # WHERE q3c_radial_query(ra, dec, 10.0, -18.0, 4.0) AND tmag BETWEEN 9 AND 13.5;
+ 
+
 Credits
 -------
 
