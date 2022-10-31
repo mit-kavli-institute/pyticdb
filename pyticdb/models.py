@@ -8,7 +8,7 @@ Base = orm.declarative_base()
 class TICEntry(Base):
     __tablename__ = "ticentries"
 
-    id = sa.Column(sa.BigInteger())
+    id = sa.Column(sa.BigInteger(), primary_key=True)
     version = sa.Column(sa.BigInteger())
     hip = sa.Column(sa.BigInteger())
     tyc = sa.Column(sa.Text())
