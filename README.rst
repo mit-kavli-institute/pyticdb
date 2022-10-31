@@ -32,6 +32,7 @@ Features
 --------
 Provides an easy interface with the TESS Input Catalog
 
+
 .. code-block:: python
     :caption: Querying by TIC primary keys
 
