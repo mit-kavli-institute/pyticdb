@@ -15,6 +15,27 @@ FILTER_TYPE = typing.Union[
 
 
 def expression_from_kwarg(kwarg: str, rhs: typing.Any) -> BinaryExpression:
+    """
+    A quick implementation of a Django like interface allowing keyword names
+    to be interpreted as sql column expressions.
+
+    Parameters
+    ----------
+    kwarg: str
+        The kwarg string. Should be in the format of ``column__operator``.
+
+    rhs: typing.Any
+        The value used as the operation right hand side.
+
+    Returns
+    -------
+    The interpreted sqlalchemy BinaryExpression.
+
+    Example
+    -------
+    >>> expression_from_kwarg(tmag__ge=13.5)
+    >>> # Equivalent to (TicEntry.tmag <= 13.5)
+    """
     col_name, op_name = kwarg.split("__")
     lhs = getattr(TICEntry, col_name)
     op = getattr(operator, op_name)
@@ -45,6 +66,23 @@ def query_by_id(
     expression_filters: FILTER_TYPE = None,
     **keyword_filters
 ) -> typing.List[typing.Tuple]:
+    """
+    Get TIC parameters by querying from primary key(s).
+
+    Parameters
+    ----------
+    id: integer or iterable of integers
+        The primary key values to restrict the query to.
+    *fields: str
+        Names of columns to return.
+    expression_filters: BinaryExpression or list of BinaryExpressions
+        Additional filters to use.
+    keyword_filters:
+        Django like keywords to provide easy filtering without imports of
+        TicEntry. Usage is such: ``column__operator=value`` which is
+        interpreted like ``column operator value``. Where `operator` is the
+        property within the standard library ``operator`` module.
+    """
     q = TICEntry.select_from_fields(*fields)
 
     filters = []
@@ -70,6 +108,27 @@ def query_by_loc(
     expression_filters: FILTER_TYPE = None,
     **keyword_filters
 ) -> typing.List[typing.Tuple]:
+    """
+    Get TIC parameters by a radial query.
+
+    Parameters
+    ----------
+    ra: float
+        The right ascension center of the radial query.
+    dec: float
+        The declination center of the radia query.
+    radius: float
+        The maximum radial distance to consider in units of degrees.
+    *fields: str
+        Names of columns to return.
+    expression_filters: BinaryExpression or list of BinaryExpressions
+        Additional filters to use.
+    keyword_filters:
+        Django like keywords to provide easy filtering without imports of
+        TicEntry. Usage is such: ``column__operator=value`` which is
+        interpreted like ``column operator value``. Where `operator` is the
+        property within the standard library ``operator`` module.
+    """
     q = TICEntry.select_from_fields(*fields)
 
     filters = [
@@ -86,6 +145,10 @@ def query_by_loc(
 
 
 def query_raw(sql) -> typing.List[typing.Tuple]:
+    """
+    Pass a raw sql string to interpret. The provided text is assumed to be safe
+    and no sanitization is performed! Use with caution!
+    """
     q = sa.text(sql)
 
     with TicDB() as db:
