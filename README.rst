@@ -27,6 +27,16 @@ Installation
 ------------
 Install by cloning and running ``pip install --upgrade -U .``
 
+Configuration must be provided a file ``~/.config/tic/db.conf`` and populated as such
+
+.. code-block:: ini
+
+   [Credentials]
+   username={POSTGRES_USERNAME}
+   password={POSTGRES_PASSWORD}
+   host={POSTGRES_HOST}
+   port={POSTGRES_PORT}
+
 
 Features
 --------
@@ -85,7 +95,7 @@ filtering through django-like parameters and filtering through SQLAlchemy expres
     # SELECT id, ra, dec, tmag
     # FROM ticentries
     # WHERE q3c_radial_query(ra, dec, 10.0, -18.0, 4.0) AND tmag BETWEEN 9 AND 13.5;
- 
+
 
 Credits
 -------
