@@ -25,7 +25,7 @@ A python wrapper for the TESS Input Catalog.
 
 Installation
 ------------
-Install by cloning and running `pip install --upgrade -U .`
+Install by cloning and running ``pip install --upgrade -U .``
 
 
 Features
