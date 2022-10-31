@@ -1,8 +1,11 @@
 import sqlalchemy as sa
+from sqlalchemy import orm
 from sqlalchemy.dialects import postgresql as psql
 
+Base = orm.declarative_base()
 
-class TICEntry(sa.Model):
+
+class TICEntry(Base):
     __tablename__ = "ticentries"
 
     id = sa.Column(sa.BigInteger())
