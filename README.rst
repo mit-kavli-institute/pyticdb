@@ -34,7 +34,6 @@ Provides an easy interface with the TESS Input Catalog
 
 
 .. code-block:: python
-    :caption: Querying by TIC primary keys
 
     from pyticdb import query_by_id
 
@@ -51,7 +50,6 @@ Provides an easy interface with the TESS Input Catalog
 
 
 .. code-block:: python
-    :caption: Radial Querying
 
     from pyticdb import query_by_loc
 
