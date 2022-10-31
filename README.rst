@@ -63,7 +63,7 @@ Provides an easy interface with the TESS Input Catalog
 
 
 ``PyTICDB`` also provides interfaces for further filtering queries; we provide
-filtering through a django-like parameter and filtering through SQLAlchemy expressions.
+filtering through a django-like parameters and filtering through SQLAlchemy expressions.
 
 .. code-block:: python
 
