@@ -28,6 +28,9 @@ class RemoteReturn:
     def __getitem__(self, idx):
         return self._data[idx]
 
+    def __repr__(self):
+        return repr(self._data)
+
     def shape(self) -> typing.Union[int, typing.Tuple[int, int]]:
         if len(self._data) > 0:
             return (len(self._data), len(self._data[0]))
