@@ -94,7 +94,7 @@ class RemoteReturn:
 
     def apply(
         self, function: typing.Callable[[Row], typing.Any]
-    ) -> typing.Generator[typing.Any]:
+    ) -> typing.Iterator[typing.Any]:
         """
         Apply the given function to each SQL alchemy row. Essentially an alias
         to ``map(function, query_func(*foo))``.
@@ -107,7 +107,7 @@ class RemoteReturn:
 
         Returns
         -------
-        typing.Generator[typing.Any]
+        typing.Iterator[typing.Any]
             A generator yielding returns from the provided function.
         """
         return map(function, self._data)
