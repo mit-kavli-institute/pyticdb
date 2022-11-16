@@ -1,3 +1,4 @@
+import datetime
 import typing
 
 from sqlalchemy.engine import CursorResult, Row
@@ -14,7 +15,9 @@ class RemoteReturn:
     """
 
     def __init__(self, cursor: CursorResult):
+        self.query_time_start = datetime.datetime.now()
         self._data = list(cursor.fetchall())
+        self.query_time_end = datetime.datetime.now()
 
     def __len__(self) -> int:
         return len(self._data)
@@ -30,6 +33,10 @@ class RemoteReturn:
             return (len(self._data), len(self._data[0]))
         else:
             return 0
+
+    @property
+    def time_elapsed(self) -> datetime.timedelta:
+        return self.query_time_end - self.query_time_start
 
     def to(self, transform_func: FUNCTYPE, *args, **kwargs) -> typing.Any:
         """
