@@ -7,6 +7,7 @@ from sqlalchemy.sql.elements import BinaryExpression
 
 from pyticdb.conn import TicDB
 from pyticdb.models import TICEntry
+from pyticdb.transform import RemoteReturn
 
 INT_SCALAR_OR_LIST = typing.Union[int, typing.List[int]]
 FILTER_TYPE = typing.Union[
@@ -65,7 +66,7 @@ def query_by_id(
     *fields: str,
     expression_filters: FILTER_TYPE = None,
     **keyword_filters
-) -> typing.List[typing.Tuple]:
+) -> RemoteReturn:
     """
     Get TIC parameters by querying from primary key(s).
 
@@ -97,7 +98,7 @@ def query_by_id(
     q = apply_filters(q, filters, keyword_filters)
 
     with TicDB() as db:
-        return list(db.execute(q).fetchall())
+        return RemoteReturn(db.execute(q))
 
 
 def query_by_loc(
@@ -107,7 +108,7 @@ def query_by_loc(
     *fields: str,
     expression_filters: FILTER_TYPE = None,
     **keyword_filters
-) -> typing.List[typing.Tuple]:
+) -> RemoteReturn:
     """
     Get TIC parameters by a radial query.
 
@@ -141,10 +142,10 @@ def query_by_loc(
     q = apply_filters(q, filters, keyword_filters)
 
     with TicDB() as db:
-        return db.execute(q).fetchall()
+        return RemoteReturn(db.execute(q))
 
 
-def query_raw(sql) -> typing.List[typing.Tuple]:
+def query_raw(sql) -> RemoteReturn:
     """
     Pass a raw sql string to interpret. The provided text is assumed to be safe
     and no sanitization is performed! Use with caution!
@@ -152,4 +153,4 @@ def query_raw(sql) -> typing.List[typing.Tuple]:
     q = sa.text(sql)
 
     with TicDB() as db:
-        return db.execute(q).fetchall()
+        return RemoteReturn(db.execute(q))
