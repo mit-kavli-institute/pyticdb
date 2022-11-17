@@ -29,7 +29,7 @@ class RemoteReturn:
         return self._data[idx]
 
     def __repr__(self):
-        return repr(self._data)
+        return f"<RemoteReturn {self.shape} {self.time_elapsed}>"
 
     def shape(self) -> typing.Union[int, typing.Tuple[int, int]]:
         if len(self._data) > 0:
