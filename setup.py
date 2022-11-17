@@ -2,7 +2,27 @@
 
 """The setup script."""
 
+import codecs
+import pathlib
+
 from setuptools import find_packages, setup
+
+
+# See https://packaging.python.org/guides/single-sourcing-package-version/
+def read(rel_path):
+    here = pathlib.Path(__file__).resolve().parent()
+    with codecs.open(here / rel_path) as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -46,6 +66,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://tessgit.mit.edu/wcfong/pyticdb",
-    version="0.1.1a0",
+    version=get_version("pyticdb/__init__.py"),
     zip_safe=False,
 )
