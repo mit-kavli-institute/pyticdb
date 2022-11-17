@@ -86,7 +86,7 @@ class RemoteReturn:
     def to_mapping(
         self,
         map_class: typing.Mapping = dict,
-        ident: typing.Union[None, str] = None,
+        ident: typing.Optional[str] = None,
     ) -> typing.Mapping:
         """
         Convert the flat SQL return into a keyable mapping.
