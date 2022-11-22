@@ -86,10 +86,10 @@ def query_by_id(
     q = TICEntry.select_from_fields(*fields)
 
     filters = []
-    if isinstance(id, list):
-        filters.append(TICEntry.id.in_(id))
-    else:
+    if isinstance(id, int):
         filters.append(TICEntry.id == id)
+    else:
+        filters.append(TICEntry.id.in_(id))
 
     if expression_filters is not None:
         filters.extend(expression_filters)
