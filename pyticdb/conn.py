@@ -20,7 +20,7 @@ def _checkout(dbapi_connection, connection_record, connection_proxy):
         connection_record.dbapi_connection = None
         connection_proxy.dbapi_connection = None
         raise sa.exc.DisconnectionError(
-            f"Connection record belongs to pid {connection_record['pid']} "
+            f"Connection record belongs to pid {connection_record.info['pid']} "
             f"attempting to check out in pid {pid}"
         )
 
