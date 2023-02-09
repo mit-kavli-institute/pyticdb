@@ -85,7 +85,7 @@ class RemoteReturn:
 
     def to_mapping(
         self,
-        map_class: typing.Mapping = dict,
+        map_class: type[typing.Mapping] = dict,
         ident: typing.Optional[str] = None,
     ) -> typing.Mapping:
         """
