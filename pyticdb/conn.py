@@ -53,13 +53,8 @@ def create_engine_from_config(username, password, database, host, port):
 @conf.option("host", type=str, default="localhost")
 @conf.option("port", type=int, default=5432)
 def session_from_config(username, password, database, host, port):
-    engine = create_engine_from_config(
-        username=username,
-        password=password,
-        database=database,
-        host=host,
-        port=port,
-    )
+    url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
+    engine = sa.create_engine(url)
     return orm.sessionmaker(bind=engine)
 
 
