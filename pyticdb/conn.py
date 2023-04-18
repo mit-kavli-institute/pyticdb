@@ -21,8 +21,8 @@ def _checkout(dbapi_connection, connection_record, connection_proxy):
         connection_record.dbapi_connection = None
         connection_proxy.dbapi_connection = None
         raise sa.exc.DisconnectionError(
-            f"Connection record belongs to pid {connection_record.info['pid']} "
-            f"attempting to check out in pid {pid}"
+            f"Connection record belongs to pid {connection_record.info['pid']}"
+            f" attempting to check out in pid {pid}"
         )
 
 
@@ -52,20 +52,18 @@ def create_engine_from_config(username, password, database, host, port):
 @conf.option("database", type=str, default="tic_82")
 @conf.option("host", type=str, default="localhost")
 @conf.option("port", type=int, default=5432)
-def create_session_from_config(username, password, database, host, port):
+def session_from_config(username, password, database, host, port):
     engine = create_engine_from_config(
         username=username,
         password=password,
         database=database,
         host=host,
-        port=port
+        port=port,
     )
-    return orm.sessionmaker(bind=ENGINE)
-
-
+    return orm.sessionmaker(bind=engine)
 
 
 try:
-    TicDB = create_session_from_config(CONFIG_PATH)
+    TicDB = session_from_config(CONFIG_PATH)
 except FileNotFoundError:
     logger.error(f"Could not find a configuration file at '{CONFIG_PATH}'")
