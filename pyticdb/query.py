@@ -99,7 +99,7 @@ def query_by_id(
 
     filters = []
 
-    if _is_iterable(id):
+    if _is_iterable(id) and not isinstance(id, str):
         filters.append(TICEntry.id.in_(id))
     else:
         filters.append(TICEntry.id == id)
