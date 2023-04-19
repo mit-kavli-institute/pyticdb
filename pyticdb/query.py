@@ -14,6 +14,18 @@ FILTER_TYPE = typing.Union[
 ]
 
 
+def _is_iterable(obj: typing.Any) -> bool:
+    """
+    Quickly determine if an object is iterable. Returns True if the object
+    can be iterated on.
+    """
+    try:
+        iter(obj)
+    except TypeError:
+        return False
+    return True
+
+
 def expression_from_kwarg(kwarg: str, rhs: typing.Any) -> BinaryExpression:
     """
     A quick implementation of a Django like interface allowing keyword names
@@ -86,10 +98,11 @@ def query_by_id(
     q = TICEntry.select_from_fields(*fields)
 
     filters = []
-    if isinstance(id, int):
-        filters.append(TICEntry.id == id)
-    else:
+
+    if _is_iterable(id):
         filters.append(TICEntry.id.in_(id))
+    else:
+        filters.append(TICEntry.id == id)
 
     if expression_filters is not None:
         filters.extend(expression_filters)
