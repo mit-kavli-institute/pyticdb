@@ -4,7 +4,7 @@ import pathlib
 import configurables as conf
 import sqlalchemy as sa
 from loguru import logger
-from sqlalchemy import orm
+from sqlalchemy import MetaData, orm
 
 CONFIG_DIR = pathlib.Path.home() / ".config" / "tic"
 CONFIG_NAME = "db.conf"
@@ -56,6 +56,48 @@ def session_from_config(username, password, database, host, port):
     url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
     engine = sa.create_engine(url)
     return orm.sessionmaker(bind=engine)
+
+
+@conf.configurable()
+@conf.param("username")
+@conf.param("password")
+@conf.param("database")
+@conf.param("host")
+@conf.option("port", type=int, default=5432)
+@conf.option("dialect", default="postgresql")
+def reflected_session(**configuration):
+    """
+    Reflect the specified database. The configuration header has been left
+    unspecified to allow to runtime changes to whatever configuration file and
+    whatever section to use.
+
+    This function also allows non-postgresql dialects to be used.
+
+    Returns
+    -------
+    tuple[MetaData, sessionmaker]
+        Returns both the reflect metadata (such as tables, sequences, schemas,
+        etc) as well as a sessionmaker to the specified database. It is up to
+        the callee to know the schema they will be interacting with.
+
+    Examples
+    --------
+    >>> from pyticdb.conn import reflected_session
+    >>> meta, session = reflected_session(
+    >>>     "./somedb.ini",
+    >>>     _section="db_credentials"
+    >>> )
+    >>> with session() as db:
+    >>>     table = meta.tables["some_table"]
+    >>>     print(db.query(table.c.some_column).all())
+    """
+    url = "{dialect://{username}:{password}@{host}:{port}/{database}"
+    url = url.format(**configuration)
+    engine = register_engine_guards(sa.create_engine(url))
+    reflected_metadata = MetaData()
+    reflected_metadata.reflect(bind=engine)  # Load the remote schema
+
+    return reflected_metadata, orm.sessionmaker(bind=engine)
 
 
 try:
