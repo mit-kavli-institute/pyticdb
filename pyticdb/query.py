@@ -125,13 +125,7 @@ def query_by_id(
 
     pk_columns = list(table.primary_key)
     depth = len(pk_columns)
-
-    if depth == 1:
-        if _is_iterable(id) and not isinstance(id, str):
-            filters.append(pk_columns[0].in_(id))
-        else:
-            filters.append(pk_columns[0] == id)
-    elif depth == 0:
+    if depth == 0:
         # Attempt to recover by using a field called 'id'
         try:
             pk_columns = [table.c.id]
@@ -141,6 +135,12 @@ def query_by_id(
                 f"No primary key is specified on {database}: {table}. Attempts"
                 " to use a field called 'id' failed as well."
             )
+
+    if depth == 1:
+        if _is_iterable(id) and not isinstance(id, str):
+            filters.append(pk_columns[0].in_(id))
+        else:
+            filters.append(pk_columns[0] == id)
     else:
         # Handle composite primary key
         print(f"Cannot handle composite key of lenth {depth}: {pk_columns}")
