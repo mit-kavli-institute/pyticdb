@@ -99,7 +99,7 @@ def query_by_id(
     database: Session,
     table: sa.Table,
     expression_filters: FILTER_TYPE = None,
-    **keyword_filters
+    **keyword_filters,
 ) -> typing.List[typing.Tuple]:
     """
     Get TIC parameters by querying from primary key(s).
@@ -133,6 +133,7 @@ def query_by_id(
             filters.append(pk_columns[0] == id)
     else:
         # Handle composite primary key
+        print(f"Cannot handle composite key of lenth {depth}: {pk_columns}")
         raise NotImplementedError
 
     if expression_filters is not None:
@@ -153,7 +154,7 @@ def query_by_loc(
     table: sa.Table,
     *fields: str,
     expression_filters: FILTER_TYPE = None,
-    **keyword_filters
+    **keyword_filters,
 ) -> typing.List[typing.Tuple]:
     """
     Get TIC parameters by a radial query.
