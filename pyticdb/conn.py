@@ -52,7 +52,7 @@ def register_engine_guards(engine):
 @conf.param("username")
 @conf.param("password")
 @conf.param("database")
-@conf.param("host")
+@conf.option("host", default="localhost")
 @conf.option("port", type=int, default=5432)
 @conf.option("dialect", default="postgresql")
 def reflected_session(**configuration):
