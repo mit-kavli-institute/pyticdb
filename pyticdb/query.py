@@ -36,7 +36,9 @@ def resolve_database(func):
             table = "ticentries"
         meta, sessionmaker = Databases[database]
         table = meta.tables[table]
-        return func(*args, table=table, database=sessionmaker(), **kwargs)
+        kwargs["database"] = sessionmaker()
+        kwargs["table"] = table
+        return func(*args, **kwargs)
 
     return wrapper
 
@@ -93,9 +95,9 @@ def apply_filters(
 @resolve_database
 def query_by_id(
     id: INT_SCALAR_OR_LIST,
+    *fields: str,
     database: Session,
     table: sa.Table,
-    *fields: str,
     expression_filters: FILTER_TYPE = None,
     **keyword_filters
 ) -> typing.List[typing.Tuple]:
