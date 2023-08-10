@@ -17,7 +17,8 @@ class TableReflectionCache(dict):
             return super().__getitem__(key)
         except KeyError:
             metadata, sessionmaker = reflected_session(
-                _filepath=CONFIG_PATH, _section=key
+                _filepath=CONFIG_PATH,
+                _section=key,
             )
             self[key] = metadata, sessionmaker
             return metadata, sessionmaker
@@ -81,7 +82,7 @@ def reflected_session(**configuration):
     >>>     table = meta.tables["some_table"]
     >>>     print(db.query(table.c.some_column).all())
     """
-    url = "{dialect://{username}:{password}@{host}:{port}/{database}"
+    url = "{dialect}://{username}:{password}@{host}:{port}/{database}"
     url = url.format(**configuration)
     engine = register_engine_guards(sa.create_engine(url))
     reflected_metadata = MetaData()
