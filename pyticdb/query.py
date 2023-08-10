@@ -160,9 +160,9 @@ def query_by_loc(
     ra: float,
     dec: float,
     radius: float,
+    *fields: str,
     database: Session,
     table: sa.Table,
-    *fields: str,
     expression_filters: FILTER_TYPE = None,
     **keyword_filters,
 ) -> typing.List[typing.Tuple]:
