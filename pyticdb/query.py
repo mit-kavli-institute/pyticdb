@@ -135,11 +135,6 @@ def query_by_id(
         # Handle composite primary key
         raise NotImplementedError
 
-    if _is_iterable(id) and not isinstance(id, str):
-        filters.append(table.c.id.in_(id))
-    else:
-        filters.append(table.c.id == id)
-
     if expression_filters is not None:
         filters.extend(expression_filters)
 
