@@ -197,3 +197,8 @@ def query_raw(
 
     with database as db:
         return list(db.execute(q).fetchall())
+
+
+@resolve_database
+def inspect_schema(database: Session, table: sa.Table):
+    print(table)
