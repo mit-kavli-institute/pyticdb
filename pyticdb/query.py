@@ -123,6 +123,18 @@ def query_by_id(
 
     filters = []
 
+    pk_columns = list(table.primary_key)
+    depth = len(pk_columns)
+
+    if depth == 1:
+        if _is_iterable(id) and not isinstance(id, str):
+            filters.append(pk_columns[0].in_(id))
+        else:
+            filters.append(pk_columns[0] == id)
+    else:
+        # Handle composite primary key
+        raise NotImplementedError
+
     if _is_iterable(id) and not isinstance(id, str):
         filters.append(table.c.id.in_(id))
     else:
