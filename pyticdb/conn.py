@@ -11,6 +11,21 @@ CONFIG_NAME = "db.conf"
 CONFIG_PATH = CONFIG_DIR / CONFIG_NAME
 
 
+class TableReflectionCache(dict):
+    def __getitem__(self, key):
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            metadata, sessionmaker = reflected_session(
+                _filepath=CONFIG_PATH, _section=key
+            )
+            self[key] = metadata, sessionmaker
+            return metadata, sessionmaker
+
+
+Databases = TableReflectionCache()
+
+
 def _connect(dbapi_connection, connection_record):
     connection_record.info["pid"] = os.getpid()
 
@@ -31,31 +46,6 @@ def register_engine_guards(engine):
     sa.event.listens_for(engine, "connect")(_connect)
     sa.event.listens_for(engine, "checkout")(_checkout)
     return engine
-
-
-@conf.configurable("Credentials")
-@conf.param("username")
-@conf.param("password")
-@conf.option("database", type=str, default="tic_82")
-@conf.option("host", type=str, default="localhost")
-@conf.option("port", type=int, default=5432)
-def create_engine_from_config(username, password, database, host, port):
-    url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
-    engine = sa.create_engine(url)
-
-    return register_engine_guards(engine)
-
-
-@conf.configurable("Credentials")
-@conf.param("username")
-@conf.param("password")
-@conf.option("database", type=str, default="tic_82")
-@conf.option("host", type=str, default="localhost")
-@conf.option("port", type=int, default=5432)
-def session_from_config(username, password, database, host, port):
-    url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
-    engine = sa.create_engine(url)
-    return orm.sessionmaker(bind=engine)
 
 
 @conf.configurable()
@@ -98,9 +88,3 @@ def reflected_session(**configuration):
     reflected_metadata.reflect(bind=engine)  # Load the remote schema
 
     return reflected_metadata, orm.sessionmaker(bind=engine)
-
-
-try:
-    TicDB = session_from_config(CONFIG_PATH)
-except FileNotFoundError:
-    logger.error(f"Could not find a configuration file at '{CONFIG_PATH}'")
