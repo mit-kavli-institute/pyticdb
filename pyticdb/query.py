@@ -202,3 +202,4 @@ def query_raw(
 @resolve_database
 def inspect_schema(database: Session, table: sa.Table):
     print(table)
+    print(table.columns)
