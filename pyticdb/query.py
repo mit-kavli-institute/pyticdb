@@ -131,6 +131,16 @@ def query_by_id(
             filters.append(pk_columns[0].in_(id))
         else:
             filters.append(pk_columns[0] == id)
+    elif depth == 0:
+        # Attempt to recover by using a field called 'id'
+        try:
+            pk_columns = [table.c.id]
+            depth = 1
+        except AttributeError:
+            raise RuntimeError(
+                f"No primary key is specified on {database}: {table}. Attempts"
+                " to use a field called 'id' failed as well."
+            )
     else:
         # Handle composite primary key
         print(f"Cannot handle composite key of lenth {depth}: {pk_columns}")
