@@ -92,7 +92,6 @@ def reflected_session(**configuration):
 
 
 try:
-    ticmeta, TICDB = Databases["tic_82"]
-    TICEntry = ticmeta.tables["ticentries"].c
+    _, TicDB = Databases["tic_82"]
 except KeyError:
-    TICEntry = TICDB = None
+    TicDB = None
