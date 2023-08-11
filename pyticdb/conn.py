@@ -89,3 +89,10 @@ def reflected_session(**configuration):
     reflected_metadata.reflect(bind=engine)  # Load the remote schema
 
     return reflected_metadata, orm.sessionmaker(bind=engine)
+
+
+try:
+    ticmeta, TICDB = Databases["tic_82"]
+    TICEntry = ticmeta.tables["ticentries"].c
+except KeyError:
+    TICEntry = TICDB = None
