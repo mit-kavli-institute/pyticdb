@@ -46,6 +46,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://tessgit.mit.edu/wcfong/pyticdb",
-    version="0.1.3",
+    version="1.0.0",
     zip_safe=False,
 )
