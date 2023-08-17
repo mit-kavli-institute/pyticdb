@@ -31,16 +31,31 @@ Configuration must be provided a file ``~/.config/tic/db.conf`` and populated as
 
 .. code-block:: ini
 
-   [Credentials]
+   [tic_82]
    username={POSTGRES_USERNAME}
    password={POSTGRES_PASSWORD}
+   database=tic_82
    host={POSTGRES_HOST}
    port={POSTGRES_PORT}
 
+You may also define any other catalog database as such:
+
+.. code-block:: ini
+   [meaningful-name]
+   username={POSTGERS_USERNAME}
+   password={POSTGRES_PASSWORD}
+   database={POSTGRES_DATABASE}
+   host={POSTGRES_HOST}
+   port={POSTGRES_PORT}
 
 Features
 --------
-Provides an easy interface with the TESS Input Catalog
+Provides an easy interface with the TESS Input Catalog by default although
+other spatial databases may be used as well.
+
+By default, the TIC (8.2) is used. However any SQL database catalog may be
+used so long as the configuration credentials are stored in the config file
+under their own sections.
 
 
 .. code-block:: python
@@ -71,6 +86,22 @@ Provides an easy interface with the TESS Input Catalog
     # (322510866, 7.05469912571, -20.8776725744, 15.7966)
     # ...
 
+To use other databases you may provide the config section name and what table
+you wish to query.
+
+.. code-block:: python
+
+    from pyticdb import query_by_id
+
+    result = query_by_loc(
+        10.0,
+        -20.0,
+        5.0,
+        "source_id",
+        database="gaia3",
+        table="gaia_source"
+    )
+
 
 ``PyTICDB`` also provides interfaces for further filtering queries; we provide
 filtering through django-like parameters and filtering through SQLAlchemy expressions.
@@ -86,10 +117,19 @@ filtering through django-like parameters and filtering through SQLAlchemy expres
     # FROM ticentries
     # WHERE q3c_radial_query(ra, dec, 10.0, -18.0, 4.0) AND tmag <= 13.5;
 
-    # Or you may pass SQLAlchemy expressions.
-    from pyticdb.models import TICEntry
 
-    filters = [TICEntry.tmag.between(9, 13.5)]
+However, more complex querying functionality might be needed. In those cases
+you can access the reflected tables in the global Databases cache.
+
+.. code-block:: python
+
+    # Or you may pass SQLAlchemy expressions.
+    from pyticdb.conn import Databases
+
+    meta, _ = Databases["tic_82"]
+    TICEntry = meta.tables["ticentries"]
+
+    filters = [TICEntry.c.tmag.between(9, 13.5)]
     result = query_by_loc(10.0, -18.0, 4.0, "id", "ra", "dec", "tmag", expression_filters=filters)
     # ^ resembles
     # SELECT id, ra, dec, tmag
