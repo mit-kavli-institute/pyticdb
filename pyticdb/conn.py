@@ -5,6 +5,7 @@ import configurables as conf
 import sqlalchemy as sa
 from loguru import logger
 from sqlalchemy import MetaData, orm
+from sqlalchemy.pool import NullPool
 
 CONFIG_DIR = pathlib.Path.home() / ".config" / "tic"
 CONFIG_NAME = "db.conf"
@@ -84,7 +85,7 @@ def reflected_session(**configuration):
     """
     url = "{dialect}://{username}:{password}@{host}:{port}/{database}"
     url = url.format(**configuration)
-    engine = register_engine_guards(sa.create_engine(url))
+    engine = register_engine_guards(sa.create_engine(url, poolclass=NullPool))
     reflected_metadata = MetaData()
     reflected_metadata.reflect(bind=engine)  # Load the remote schema
 
