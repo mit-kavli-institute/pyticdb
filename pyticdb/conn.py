@@ -4,7 +4,7 @@ import pathlib
 import configurables as conf
 import sqlalchemy as sa
 from loguru import logger
-from sqlalchemy import orm
+from sqlalchemy import NullPool, orm
 
 CONFIG_DIR = pathlib.Path.home() / ".config" / "tic"
 CONFIG_NAME = "db.conf"
@@ -40,8 +40,10 @@ def register_engine_guards(engine):
 @conf.option("host", type=str, default="localhost")
 @conf.option("port", type=int, default=5432)
 def create_engine_from_config(username, password, database, host, port):
-    url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
-    engine = sa.create_engine(url)
+    url = (
+        f"postgresql://{username}:{password}@{host}:{port}/{database}"  # noqa
+    )
+    engine = sa.create_engine(url, pool=NullPool)
 
     return register_engine_guards(engine)
 
@@ -53,12 +55,18 @@ def create_engine_from_config(username, password, database, host, port):
 @conf.option("host", type=str, default="localhost")
 @conf.option("port", type=int, default=5432)
 def session_from_config(username, password, database, host, port):
-    url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
+    url = (
+        f"postgresql://{username}:{password}@{host}:{port}/{database}"  # noqa
+    )
     engine = sa.create_engine(url)
     return orm.sessionmaker(bind=engine)
 
 
-try:
-    TicDB = session_from_config(CONFIG_PATH)
-except FileNotFoundError:
+Session = orm.sessionmaker()
+
+if CONFIG_PATH.exists():
+    Session.configure(bind=create_engine_from_config(CONFIG_PATH))
+    TicDB = Session()
+else:
     logger.error(f"Could not find a configuration file at '{CONFIG_PATH}'")
+    TicDB = None
