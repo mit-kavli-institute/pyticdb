@@ -13,4 +13,4 @@ __all__ = [
 ]
 __author__ = """William Fong"""
 __email__ = "willfong@mit.edu"
-__version__ = "0.1.3"
+__version__ = "0.1.4"
