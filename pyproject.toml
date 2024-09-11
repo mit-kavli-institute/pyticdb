@@ -1,3 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lightcurvedb"]
+
+[project]
+name = "pyticdb"
+version = "1.0.2"
+description = "A package to manage PDO compute nodes cooperatively."
+authors = [{name="William Fong", email="willfong@mit.edu"}]
+readme = "README.md"
+
+dependencies = [
+    "configurables @ git+ssh://git@tessgit.mit.edu/wcfong/configurables.git",
+    "sqlalchemy==2.0.29",
+    "loguru",
+    "psycopg[binary]>=3.1.19",
+]
+
+[project.urls]
+Home = "https://tessgit.mit.edu/wcfong/pyticdb"
+
 [tool.black]
 line-length = 79
 
