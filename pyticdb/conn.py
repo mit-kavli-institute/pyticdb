@@ -1,14 +1,45 @@
 import os
 import pathlib
+import warnings
+from typing import Union
 
 import configurables as conf
 import sqlalchemy as sa
 from loguru import logger
-from sqlalchemy import NullPool, orm
+from sqlalchemy import MetaData, NullPool, orm
 
 CONFIG_DIR = pathlib.Path.home() / ".config" / "tic"
 CONFIG_NAME = "db.conf"
 CONFIG_PATH = CONFIG_DIR / CONFIG_NAME
+
+
+class TableReflectionCache(dict):
+    def __init__(self, config: pathlib.Path = CONFIG_PATH):
+        self.config = config
+
+    def __getitem__(
+        self, key
+    ) -> Union[
+        tuple[MetaData, orm.sessionmaker[orm.Session]], tuple[None, None]
+    ]:
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            try:
+                metadata, session = reflected_session(
+                    _filepath=self.config,
+                    _section=key,
+                )
+                self[key] = metadata, session
+                return metadata, session
+            except FileNotFoundError:
+                warnings.warn(
+                    RuntimeWarning(f"Configuration for {key} not found")
+                )
+                return None, None
+
+
+Databases = TableReflectionCache()
 
 
 def _connect(dbapi_connection, connection_record):
@@ -33,40 +64,53 @@ def register_engine_guards(engine):
     return engine
 
 
-@conf.configurable("Credentials")
+@conf.configurable()
 @conf.param("username")
 @conf.param("password")
-@conf.option("database", type=str, default="tic_82")
-@conf.option("host", type=str, default="localhost")
+@conf.param("database")
+@conf.option("host", default="localhost")
 @conf.option("port", type=int, default=5432)
-def create_engine_from_config(username, password, database, host, port):
-    url = (
-        f"postgresql://{username}:{password}@{host}:{port}/{database}"  # noqa
-    )
-    engine = sa.create_engine(url, pool=NullPool)
+@conf.option("dialect", default="postgresql+psycopg")
+def reflected_session(
+    **configuration,
+) -> tuple[MetaData, orm.sessionmaker[orm.Session]]:
+    """
+    Reflect the specified database. The configuration header has been left
+    unspecified to allow to runtime changes to whatever configuration file and
+    whatever section to use.
 
-    return register_engine_guards(engine)
+    This function also allows non-postgresql dialects to be used.
+
+    Returns
+    -------
+    tuple[MetaData, sessionmaker]
+        Returns both the reflect metadata (such as tables, sequences, schemas,
+        etc) as well as a sessionmaker to the specified database. It is up to
+        the callee to know the schema they will be interacting with.
+
+    Examples
+    --------
+    >>> from pyticdb.conn import reflected_session
+    >>> meta, session = reflected_session(
+    >>>     "./somedb.ini",
+    >>>     _section="db_credentials"
+    >>> )
+    >>> with session() as db:
+    >>>     table = meta.tables["some_table"]
+    >>>     print(db.query(table.c.some_column).all())
+    """
+    url = "{dialect}://{username}:{password}@{host}:{port}/{database}"
+    url = url.format(**configuration)
+    engine = register_engine_guards(sa.create_engine(url, poolclass=NullPool))
+    reflected_metadata = MetaData()
+    reflected_metadata.reflect(bind=engine)  # Load the remote schema
+
+    Session = orm.sessionmaker(bind=engine)
+
+    return reflected_metadata, Session
 
 
-@conf.configurable("Credentials")
-@conf.param("username")
-@conf.param("password")
-@conf.option("database", type=str, default="tic_82")
-@conf.option("host", type=str, default="localhost")
-@conf.option("port", type=int, default=5432)
-def session_from_config(username, password, database, host, port):
-    url = (
-        f"postgresql://{username}:{password}@{host}:{port}/{database}"  # noqa
-    )
-    engine = sa.create_engine(url)
-    return orm.sessionmaker(bind=engine)
-
-
-Session = orm.sessionmaker()
-
-if CONFIG_PATH.exists():
-    Session.configure(bind=create_engine_from_config(CONFIG_PATH))
-    TicDB = Session()
-else:
-    logger.error(f"Could not find a configuration file at '{CONFIG_PATH}'")
+try:
+    _, TicDB = Databases["tic_82"]
+except KeyError:
     TicDB = None
