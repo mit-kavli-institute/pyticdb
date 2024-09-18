@@ -94,5 +94,5 @@ def reflected_session(**configuration):
 
 try:
     _, TicDB = Databases["tic_82"]
-except KeyError:
+except (KeyError, FileNotFoundError):
     TicDB = None
