@@ -1,3 +1,51 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyticdb"]
+exclude = []
+namespaces = false
+
+[project]
+name = "lightcurvedb"
+description = "SQLAlchemy models and APIs for storing lightcurve timeseries."
+authors = [{name="William Fong", email="willfong@mit.edu"}]
+readme = "README.rst"
+dynamic = ["version"]
+
+dependencies = [
+    "sqlalchemy>=2.0",
+    "click>=8.0",
+    "psycopg[binary]>=3.1.19",
+    "setuptools>69.5",
+    "numpy>=1.12",
+    "configurables @ git+ssh://git@tessgit.mit.edu/wcfong/configurables.git",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyticdb.__version__"}
+
+
+[project.urls]
+Home = "https://tessgit.mit.edu/wcfong/pyticdb"
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.4",
+    "hypothesis>=6",
+    "hypothesis_fspaths",
+    "mypy==1.10",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-sugar",
+    "pytest-xdist",
+    "pytest>=8.2",
+    "tox>=4",
+    "tox-docker>=4.1.0",
+]
+
 [tool.black]
 line-length = 79
 
