@@ -9,8 +9,8 @@ exclude = []
 namespaces = false
 
 [project]
-name = "lightcurvedb"
-description = "SQLAlchemy models and APIs for storing lightcurve timeseries."
+name = "pyticdb"
+description = "A quick reflector for stellar catalogs and other static SQL databases"
 authors = [{name="William Fong", email="willfong@mit.edu"}]
 readme = "README.rst"
 dynamic = ["version"]
