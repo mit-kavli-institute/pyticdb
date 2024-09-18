@@ -18,7 +18,6 @@ dynamic = ["version"]
 dependencies = [
     "sqlalchemy>=2.0",
     "click>=8.0",
-    "psycopg[binary]>=3.1.19",
     "setuptools>69.5",
     "configurables @ git+ssh://git@tessgit.mit.edu/wcfong/configurables.git",
 ]
