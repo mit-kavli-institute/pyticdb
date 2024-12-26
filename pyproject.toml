@@ -19,7 +19,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "click>=8.0",
     "setuptools>69.5",
-    "configurables @ git+ssh://git@tessgit.mit.edu/wcfong/configurables.git",
+    "configurables @ git+https://github.com/mit-kavli-institute/configurables.git",
 ]
 
 [tool.setuptools.dynamic]
