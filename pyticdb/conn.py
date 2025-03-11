@@ -90,9 +90,3 @@ def reflected_session(**configuration):
     reflected_metadata.reflect(bind=engine)  # Load the remote schema
 
     return reflected_metadata, orm.sessionmaker(bind=engine)
-
-
-try:
-    _, TicDB = Databases["tic_82"]
-except (KeyError, FileNotFoundError):
-    TicDB = None
