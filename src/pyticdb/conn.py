@@ -56,7 +56,7 @@ def register_engine_guards(engine):
 @conf.param("database")
 @conf.option("host", default="localhost")
 @conf.option("port", type=int, default=5432)
-@conf.option("dialect", default="postgresql")
+@conf.option("dialect", default="postgresql+psycopg")
 def reflected_session(**configuration):
     """
     Reflect the specified database. The configuration header has been left
@@ -90,9 +90,3 @@ def reflected_session(**configuration):
     reflected_metadata.reflect(bind=engine)  # Load the remote schema
 
     return reflected_metadata, orm.sessionmaker(bind=engine)
-
-
-try:
-    _, TicDB = Databases["tic_82"]
-except (KeyError, FileNotFoundError):
-    TicDB = None
