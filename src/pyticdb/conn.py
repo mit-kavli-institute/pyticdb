@@ -1,5 +1,6 @@
 import os
 import pathlib
+import typing
 
 import configurables as conf
 import sqlalchemy as sa
@@ -12,13 +13,29 @@ CONFIG_NAME = "db.conf"
 CONFIG_PATH = CONFIG_DIR / CONFIG_NAME
 
 
-class TableReflectionCache(dict):
-    def __getitem__(self, key):
+class TableReflectionCache:
+    """
+    This class attempts to minimize cost of reflecting remote schemas.
+    Reflected schemas are served by request and then cached within a simple
+    dictionary.
+
+    If more control is needed then this class may be modified or switched
+    to dedicated caching libraries.
+    """
+
+    def __init__(self, configuration_path: typing.Optional[pathlib.Path] = CONFIG_PATH):
+        self.configuration_path = configuration_path
+        self._cache: dict[str, tuple[sa.MetaData, orm.sessionmaker]] = {}
+
+    def __setitem__(self, key: str, value: tuple[sa.MetaData, orm.sessionmaker]):
+        self._cache[key] = value
+
+    def __getitem__(self, key: str):
         try:
-            return super().__getitem__(key)
+            return self._cache[key]
         except KeyError:
             metadata, sessionmaker = reflected_session(
-                _filepath=CONFIG_PATH,
+                _filepath=self.configuration_path,
                 _section=key,
             )
             self[key] = metadata, sessionmaker
@@ -29,10 +46,22 @@ Databases = TableReflectionCache()
 
 
 def _connect(dbapi_connection, connection_record):
+    """
+    A quick function that sets the connection pid context to the current
+    process. This function is invoked upon SQLAlchemy engines establishing
+    a remote connection.
+    """
     connection_record.info["pid"] = os.getpid()
 
 
 def _checkout(dbapi_connection, connection_record, connection_proxy):
+    """
+    A quick function that will force SQLAlchemy to destroy the current engine
+    if the current process pid does not match that within the connection
+    context. If there is a disconnect, the connection will be destroyed and
+    another will be created (with the current pid populated within the
+    connection context).
+    """
     pid = os.getpid()
     if connection_record.info["pid"] != pid:
         connection_record.dbapi_connection = None
@@ -43,7 +72,12 @@ def _checkout(dbapi_connection, connection_record, connection_proxy):
         )
 
 
-def register_engine_guards(engine):
+def register_engine_guards(engine: sa.Engine) -> sa.Engine:
+    """
+    This function will wrap the provided engine within custom
+    'multiprocess guards'. This ensures that resources expected to be unique
+    per process are not shared across memory space.
+    """
     logger.trace("Registering engine {engine} with multiprocessing guards")
     sa.event.listens_for(engine, "connect")(_connect)
     sa.event.listens_for(engine, "checkout")(_checkout)
@@ -57,7 +91,7 @@ def register_engine_guards(engine):
 @conf.option("host", default="localhost")
 @conf.option("port", type=int, default=5432)
 @conf.option("dialect", default="postgresql+psycopg")
-def reflected_session(**configuration):
+def reflected_session(**configuration) -> tuple[sa.MetaData, orm.sessionmaker]:
     """
     Reflect the specified database. The configuration header has been left
     unspecified to allow to runtime changes to whatever configuration file and
