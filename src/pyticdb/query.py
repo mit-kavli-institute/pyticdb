@@ -27,7 +27,13 @@ def _is_iterable(obj: typing.Any) -> bool:
     return True
 
 
-def resolve_database(func):
+RT = typing.TypeVar("RT")
+
+def resolve_database(func: typing.Callable[..., RT]) -> typing.Callable[..., RT]:
+    """
+    Given a string, attempt to resolve the referenced database using
+    schema reflection.
+    """
     @wraps(func)
     def wrapper(*args, database=None, table=None, **kwargs):
         if database is None:
