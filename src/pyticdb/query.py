@@ -6,34 +6,22 @@ from itertools import chain
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import BinaryExpression
+from collections.abc import Iterable as IIterable
 
 from pyticdb.conn import Databases
 
-INT_SCALAR_OR_LIST = typing.Union[int, typing.List[int]]
-FILTER_TYPE = typing.Union[
-    None, BinaryExpression, typing.List[BinaryExpression]
-]
-
-
-def _is_iterable(obj: typing.Any) -> bool:
-    """
-    Quickly determine if an object is iterable. Returns True if the object
-    can be iterated on.
-    """
-    try:
-        iter(obj)
-    except TypeError:
-        return False
-    return True
-
-
+INT_SCALAR_OR_LIST = typing.Union[int, list[int], typing.Iterable[int]]
+_CMPR = typing.Union[BinaryExpression, sa.ColumnElement[bool]]
+FILTER_TYPE = typing.Union[None, _CMPR, typing.List[_CMPR]]
 RT = typing.TypeVar("RT")
+
 
 def resolve_database(func: typing.Callable[..., RT]) -> typing.Callable[..., RT]:
     """
     Given a string, attempt to resolve the referenced database using
     schema reflection.
     """
+
     @wraps(func)
     def wrapper(*args, database=None, table=None, **kwargs):
         if database is None:
@@ -85,7 +73,7 @@ def expression_from_kwarg(
 def apply_filters(
     q,
     table: sa.Table,
-    expressions: typing.List[BinaryExpression],
+    expressions: typing.List[_CMPR],
     keyword_filters: typing.Dict[str, typing.Any],
 ):
     parsed_filters = []
@@ -104,7 +92,7 @@ def query_by_id(
     *fields: str,
     database: Session,
     table: sa.Table,
-    expression_filters: FILTER_TYPE = None,
+    expression_filters: typing.Optional[list[_CMPR]] = None,
     **keyword_filters,
 ) -> typing.List[typing.Tuple]:
     """
@@ -127,7 +115,7 @@ def query_by_id(
     columns = [getattr(table.c, field) for field in fields]
     q = sa.select(*columns)
 
-    filters = []
+    filters: list[_CMPR] = []
 
     pk_columns = list(table.primary_key)
     depth = len(pk_columns)
@@ -143,13 +131,14 @@ def query_by_id(
             )
 
     if depth == 1:
-        if _is_iterable(id) and not isinstance(id, str):
-            filters.append(pk_columns[0].in_(id))
+        if isinstance(id, IIterable) and not isinstance(id, str):
+            ids = list(map(int, id))
+            filters.append(pk_columns[0].in_(ids))
         else:
-            filters.append(pk_columns[0] == id)
+            filters.append(pk_columns[0] == int(id))
     else:
         # Handle composite primary key
-        print(f"Cannot handle composite key of lenth {depth}: {pk_columns}")
+        print(f"Cannot handle composite key of length {depth}: {pk_columns}")
         raise NotImplementedError
 
     if expression_filters is not None:
@@ -169,7 +158,7 @@ def query_by_loc(
     *fields: str,
     database: Session,
     table: sa.Table,
-    expression_filters: FILTER_TYPE = None,
+    expression_filters: typing.Optional[list[_CMPR]] = None,
     **keyword_filters,
 ) -> typing.List[typing.Tuple]:
     """
@@ -196,7 +185,7 @@ def query_by_loc(
     columns = [getattr(table.c, field) for field in fields]
     q = sa.select(*columns)
 
-    filters = [
+    filters: list[_CMPR] = [
         sa.func.q3c_radial_query(table.c.ra, table.c.dec, ra, dec, radius)
     ]
 
@@ -210,9 +199,7 @@ def query_by_loc(
 
 
 @resolve_database
-def query_raw(
-    sql, database: Session, table: sa.Table
-) -> typing.List[typing.Tuple]:
+def query_raw(sql, database: Session, table: sa.Table) -> typing.List[typing.Tuple]:
     """
     Pass a raw sql string to interpret. The provided text is assumed to be safe
     and no sanitization is performed! Use with caution!
