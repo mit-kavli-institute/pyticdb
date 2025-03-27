@@ -31,5 +31,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages              # The branch we want to deploy to
-          folder: docs/_build/html      # The folder with built HTML docs
+          folder: docs/_build/          # The folder with built HTML docs
           clean: true                   # Wipes old files before deploying
