@@ -1,0 +1,35 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+        with:
+          # We need the full history so we can push to gh-pages
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Nox
+        run: pip install nox
+
+      - name: Build Docs with Nox
+        run: nox -s docs
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages              # The branch we want to deploy to
+          folder: docs/_build/html      # The folder with built HTML docs
+          clean: true                   # Wipes old files before deploying
