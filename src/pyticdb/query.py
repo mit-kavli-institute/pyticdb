@@ -132,7 +132,7 @@ def query_by_id(
 
     if depth == 1:
         if isinstance(id, IIterable) and not isinstance(id, str):
-            ids = list(map(int, id))
+            ids = set(map(int, id))
             filters.append(pk_columns[0].in_(ids))
         else:
             filters.append(pk_columns[0] == int(id))
