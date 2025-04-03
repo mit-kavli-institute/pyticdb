@@ -9,6 +9,7 @@ from sqlalchemy.sql.elements import BinaryExpression
 from collections.abc import Iterable as IIterable
 
 from pyticdb.conn import Databases
+from pyticdb.util import chunkify
 
 INT_SCALAR_OR_LIST = typing.Union[int, list[int], typing.Iterable[int]]
 _CMPR = typing.Union[BinaryExpression, sa.ColumnElement[bool]]
@@ -133,6 +134,22 @@ def query_by_id(
     if depth == 1:
         if isinstance(id, IIterable) and not isinstance(id, str):
             ids = set(map(int, id))
+            if len(ids) > 65535:
+                # We're above parameter limit, chunkify and recursively
+                # get results:
+                payload = []
+                for chunk in chunkify(ids, 65535):
+                    payload.extend(
+                        query_by_id(
+                            chunk,
+                            *fields,
+                            database=database,
+                            table=table,
+                            expression_filters=expression_filters,
+                            **keyword_filters,
+                        )
+                    )
+                return payload
             filters.append(pk_columns[0].in_(ids))
         else:
             filters.append(pk_columns[0] == int(id))
