@@ -143,7 +143,7 @@ def query_by_id(
                         query_by_id(
                             chunk,
                             *fields,
-                            database=database,
+                            database=database.get_bind().url.database,
                             table=table,
                             expression_filters=expression_filters,
                             **keyword_filters,
