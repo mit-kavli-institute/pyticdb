@@ -12,4 +12,4 @@ __all__ = [
 ]
 __author__ = """William Fong"""
 __email__ = "willfong@mit.edu"
-__version__ = "2.0.1"
+__version__ = "2.0.2"
