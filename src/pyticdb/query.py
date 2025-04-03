@@ -29,9 +29,14 @@ def resolve_database(func: typing.Callable[..., RT]) -> typing.Callable[..., RT]
             database = "tic_82"
         if table is None:
             table = "ticentries"
-        meta, sessionmaker = Databases[database]
-        table = meta.tables[table]
-        kwargs["database"] = sessionmaker()
+
+        if isinstance(database, str):
+            meta, sessionmaker = Databases[database]
+            table = meta.tables[table]
+            kwargs["database"] = sessionmaker()
+        else:
+            kwargs["database"] = database
+
         kwargs["table"] = table
         return func(*args, **kwargs)
 
@@ -143,7 +148,7 @@ def query_by_id(
                         query_by_id(
                             chunk,
                             *fields,
-                            database=database.get_bind().url.database,
+                            database=database,
                             table=table,
                             expression_filters=expression_filters,
                             **keyword_filters,
