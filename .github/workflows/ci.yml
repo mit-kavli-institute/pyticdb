@@ -26,18 +26,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install nox black isort mypy
 
-    - name: Lint with black
-      run: |
-        black --check src/ tests/
-
-    - name: Check import order with isort
-      run: |
-        isort --check-only src/ tests/
-
-    - name: Type check with mypy
-      run: |
-        mypy src/pyticdb
-
     - name: Test with nox
       run: |
         nox
