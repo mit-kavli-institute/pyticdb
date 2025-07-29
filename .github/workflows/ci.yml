@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Lint with black
+      run: |
+        black --check src/ tests/
+    
+    - name: Check import order with isort
+      run: |
+        isort --check-only src/ tests/
+    
+    - name: Type check with mypy
+      run: |
+        mypy src/pyticdb
+    
+    - name: Test with pytest
+      run: |
+        pytest tests/ -v
+
+  commit-lint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check commit messages
+      uses: wagoid/commitlint-github-action@v5
+      with:
+        configFile: .commitlintrc.json
