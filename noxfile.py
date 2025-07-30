@@ -3,7 +3,11 @@ import nox
 
 @nox.session
 def tests(session: nox.Session):
-    session.install(".[dev]")
+    session.install(
+        ".[dev]",
+        "--extra-index-url",
+        "https://mit-kavli-institute.github.io/MIT-Kavli-PyPi/",
+    )
     session.run("pytest")
 
 
@@ -14,7 +18,12 @@ def docs(session: nox.Session):
 
     # You can also install your package in editable mode if you want autodoc
     # to see the up-to-date version:
-    session.install("-e", ".")
+    session.install(
+        "-e",
+        ".",
+        "--extra-index-url",
+        "https://mit-kavli-institute.github.io/MIT-Kavli-PyPi/",
+    )
 
     # Invoke Sphinx to build HTML
     session.run(
