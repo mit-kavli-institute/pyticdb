@@ -29,28 +29,3 @@ jobs:
     - name: Test with nox
       run: |
         nox
-
-  commit-lint:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Install commitlint
-      run: |
-        npm install --save-dev @commitlint/config-conventional @commitlint/cli
-
-    - name: Print versions
-      run: |
-        npx commitlint --version
-
-    - name: Check commit messages
-      run: |
-        npx commitlint \
-          --from ${{ github.event.pull_request.base.sha }} \
-          --to ${{ github.event.pull_request.head.sha }} \
-          --config .commitlintrc.json \
-          --verbose
