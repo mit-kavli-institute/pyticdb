@@ -39,7 +39,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install commitlint
+      run: |
+        npm install --save-dev @commitlint/config-conventional @commitlint/cli
+
+    - name: Print versions
+      run: |
+        npx commitlint --version
+
     - name: Check commit messages
-      uses: wagoid/commitlint-github-action@v5
-      with:
-        configFile: .commitlintrc.json
+      run: |
+        npx commitlint \
+          --from ${{ github.event.pull_request.base.sha }} \
+          --to ${{ github.event.pull_request.head.sha }} \
+          --config .commitlintrc.json \
+          --verbose
