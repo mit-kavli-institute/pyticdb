@@ -131,20 +131,43 @@ Or:
 
 Contributing
 ------------
-We use conventional commits and semantic versioning for this project.
+We use conventional commits and semantic versioning for this project. **All commits must follow the conventional commit format.**
 
-Commit Message Format:
+Commit Message Format
+~~~~~~~~~~~~~~~~~~~~~
 
-* ``feat:`` A new feature
-* ``fix:`` A bug fix
+Each commit message must be structured as follows::
+
+    <type>(<scope>): <subject>
+    
+    [optional body]
+    
+    [optional footer(s)]
+
+**Required format**: ``type: subject`` (scope is optional)
+
+**Types:**
+
+* ``feat:`` A new feature (triggers minor version bump)
+* ``fix:`` A bug fix (triggers patch version bump)
 * ``docs:`` Documentation only changes
-* ``style:`` Changes that do not affect the meaning of the code
+* ``style:`` Changes that do not affect the meaning of the code (formatting, etc.)
 * ``refactor:`` A code change that neither fixes a bug nor adds a feature
-* ``perf:`` A code change that improves performance
+* ``perf:`` A code change that improves performance (triggers patch version bump)
 * ``test:`` Adding missing tests or correcting existing tests
 * ``build:`` Changes that affect the build system or external dependencies
 * ``ci:`` Changes to our CI configuration files and scripts
 * ``chore:`` Other changes that don't modify src or test files
+* ``revert:`` Reverts a previous commit
+
+**Examples:**
+
+* ✅ ``feat: add spatial query optimization``
+* ✅ ``fix: resolve connection pooling issue in multiprocess environments``
+* ✅ ``docs: update installation instructions``
+* ✅ ``ci: add semantic release workflow``
+* ❌ ``added new feature`` (missing type prefix)
+* ❌ ``Fix bug`` (incorrect capitalization)
 
 License
 -------

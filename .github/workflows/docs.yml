@@ -5,19 +5,25 @@ on:
     branches: [ "main" ]
   pull_request:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy-docs:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # We need the full history so we can push to gh-pages
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -28,8 +34,10 @@ jobs:
         run: nox -s docs
 
       - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages              # The branch we want to deploy to
           folder: docs/_build/          # The folder with built HTML docs
           clean: true                   # Wipes old files before deploying
+          token: ${{ secrets.GITHUB_TOKEN }}
